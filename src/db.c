@@ -3,9 +3,8 @@
 #include <string.h>
 #include <unistd.h>
 #include <errmsg.h>
-#include "db.h"
 #include "mysql.h"
-#include "log.h"
+#include "inc.h"
 
 MYSQL * instance = NULL;
 const char * currSql = NULL;
@@ -51,7 +50,7 @@ int db_connect(){
 
 static int _db_mysql_query(const char *sql,db_query_callback callback,int onceStore,void *data){
     MYSQL_ROW row = NULL;
-    RETURN_IF_FAIL(sql,ERR_DB_SQL_IS_NULL);
+    RETURN_VAL_IF_FAIL(sql,ERR_DB_SQL_IS_NULL);
 
     int ret = db_mysql_exec(sql,1);
     if(ret) return ret;
@@ -83,7 +82,7 @@ start:
 
 
 static int _db_mysql_exec(const char *sql){
-    RETURN_IF_FAIL(sql,ERR_DB_SQL_IS_NULL);
+    RETURN_VAL_IF_FAIL(sql,ERR_DB_SQL_IS_NULL);
     mysql_query(instance,sql);
     currSql = sql;
     DB_CHECK_RETURN_IF_FAIL();
@@ -119,6 +118,10 @@ void db_mysql_init(){
     EXIT_IF_FAIL(instance,"function mysql_init failed!");
     EXIT_IF_FAIL(0==db_connect(),"connect db failed!");
     mysql_set_character_set(instance,DB_CHARSET);
+}
+
+int db_mysql_get_id(const char *sql,unsigned int *id){
+    return db_mysql_query(sql,db_callback_set_int,1,id);
 }
 
 void db_mysql_close(){

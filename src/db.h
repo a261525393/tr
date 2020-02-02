@@ -23,4 +23,6 @@ int db_mysql_exec(const char *sql,int retryAble);
 int db_mysql_get_last_insert_id(unsigned int *id);
 int db_mysql_updated_row_count(unsigned int *count);
 
+int db_mysql_get_id(const char *sql,unsigned int *id);
+
 #endif
